@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- TV-only shell: the existing Leanback browser retains every row and D-pad action. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/cinema_home"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#080B12">
+
+    <ImageView
+        android:id="@+id/cinema_backdrop"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:focusable="false"
+        android:importantForAccessibility="no" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/cinema_scrim_start"
+        android:importantForAccessibility="no" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/cinema_scrim_bottom"
+        android:importantForAccessibility="no" />
+
+    <LinearLayout
+        android:layout_width="520dp"
+        android:layout_height="176dp"
+        android:layout_marginStart="56dp"
+        android:layout_marginTop="24dp"
+        android:orientation="vertical"
+        android:focusable="false">
+
+        <TextView
+            android:id="@+id/cinema_hero_category"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/nova"
+            android:textColor="#B8C4D8"
+            android:textSize="12sp"
+            android:fontFamily="sans-serif-medium"
+            android:maxLines="1"
+            android:ellipsize="end" />
+
+        <TextView
+            android:id="@+id/cinema_hero_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/nova"
+            android:textColor="#FFFFFF"
+            android:textSize="32sp"
+            android:fontFamily="sans-serif-medium"
+            android:maxLines="2"
+            android:ellipsize="end" />
+
+        <TextView
+            android:id="@+id/cinema_hero_overview"
+            android:layout_width="480dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:lineSpacingExtra="3dp"
+            android:textColor="#DBE1EB"
+            android:textSize="15sp"
+            android:maxLines="3"
+            android:ellipsize="end" />
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/cinema_browse_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="184dp" />
+</FrameLayout>

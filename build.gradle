@@ -151,7 +151,7 @@ android {
         }
     }
     defaultConfig {
-        applicationId = "org.courville.nova"
+        applicationId = "dev.antonior.novacinema"
         generatedDensities = []
         minSdkVersion 23
         targetSdkVersion 36

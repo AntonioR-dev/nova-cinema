@@ -29,6 +29,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Bundle;
 import android.os.Process;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -249,6 +250,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
     private IntentFilter mUpdateFilter;
 
     private BackgroundManager bgMngr;
+    private CinemaHeroController mCinemaHero;
     private SharedPreferences.OnSharedPreferenceChangeListener mThemeChangeListener;
 
     private BuildBoxIconTask mBuildAllMoviesBoxTask;
@@ -290,11 +292,20 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
     }
 
     @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        ViewGroup home = (ViewGroup) inflater.inflate(R.layout.cinema_home, container, false);
+        ViewGroup browser = home.findViewById(R.id.cinema_browse_content);
+        browser.addView(super.onCreateView(inflater, browser, savedInstanceState));
+        return home;
+    }
+
+    @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         if (log.isDebugEnabled()) log.debug("onViewCreated");
         CustomApplication.loadLocale(getResources());
         super.onViewCreated(view, savedInstanceState);
         mActivity = getActivity();
+        mCinemaHero = new CinemaHeroController(mActivity, view);
 
         // Add private mode indicator overlay
         PrivateModeUIHelper.addPrivateModeIndicator(mActivity, view);
@@ -318,7 +329,8 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
 
         Resources r = getResources();
         setBadgeDrawable(ContextCompat.getDrawable(mActivity, R.drawable.leanback_title));
-        setHeadersState(HEADERS_ENABLED);
+        // Poster shelves are the default; the existing category rail remains reachable with Left.
+        setHeadersState(HEADERS_HIDDEN);
         setHeadersTransitionOnBackEnabled(true);
 
         // Apply theme-aware colors
@@ -390,6 +402,10 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
     @Override
     public void onDestroyView() {
         if (log.isDebugEnabled()) log.debug("onDestroyView");
+        if (mCinemaHero != null) {
+            mCinemaHero.destroy();
+            mCinemaHero = null;
+        }
         mRowsSelectionHandler.removeCallbacks(mClearRowPendingSelection);
         mScannerBoxRefreshHandler.removeCallbacks(mRefreshBoxesAfterScannerQuietPeriod);
         mRowPendingSelection = null;
@@ -421,6 +437,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
     public void onResume() {
         if (log.isDebugEnabled()) log.debug("onResume");
         super.onResume();
+        if (mCinemaHero != null) mCinemaHero.resume();
         CustomApplication.loadLocale(getResources());
         if (hasLocaleChanged()) {
             // Recreate the fragment or activity to apply the new locale
@@ -633,6 +650,7 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
     @Override
     public void onPause() {
         super.onPause();
+        if (mCinemaHero != null) mCinemaHero.pause();
         mOverlay.pause();
         mScannerBoxRefreshHandler.removeCallbacks(mRefreshBoxesAfterScannerQuietPeriod);
 
@@ -690,10 +708,12 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
             if (root != null) {
                 View browseFrame = root.findViewById(R.id.browse_frame);
                 if (browseFrame != null) {
-                    browseFrame.setBackgroundColor(backgroundColor);
+                    // Let the home artwork and readability scrims show behind the poster shelves.
+                    browseFrame.setBackgroundColor(android.graphics.Color.TRANSPARENT);
                 }
             }
         }
+        if (mCinemaHero != null) mCinemaHero.refresh();
     }
 
     /**
@@ -724,6 +744,13 @@ public class MainFragment extends BrowseSupportFragment implements LoaderManager
             }
         });
         if (mActivity != null) setOnItemViewClickedListener(new MainViewClickedListener(mActivity));
+        setOnItemViewSelectedListener((itemViewHolder, item, rowViewHolder, row) -> {
+            if (mCinemaHero != null) {
+                String category = row != null && row.getHeaderItem() != null
+                        ? row.getHeaderItem().getName() : getString(R.string.nova);
+                mCinemaHero.select(item, category);
+            }
+        });
     }
 
     private void loadRows() {
