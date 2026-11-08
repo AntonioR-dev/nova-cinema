@@ -1,0 +1,40 @@
+name: Nova Cinema APK
+on:
+  workflow_dispatch:
+  push:
+    branches: [cinema-release-v1]
+permissions:
+  contents: read
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: nova/Video
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - uses: android-actions/setup-android@v3
+      - name: Install Android platform
+        run: sdkmanager 'platforms;android-37.0' 'build-tools;36.0.0'
+      - name: Prepare pinned dependencies and verified official native binaries
+        run: python nova/Video/build-support/prepare.py
+      - name: Test cinematic home and TMDb settings
+        working-directory: nova/Video
+        run: python -m unittest discover -s tests -p 'test_*.py' -v
+      - name: Build installable alpha APK
+        working-directory: nova/Video
+        run: |
+          chmod +x gradlew
+          ./gradlew --no-daemon --console=plain -Puniversal assembleNoamazonDebug -x :FileCoreLibrary:ndkBuild -x :MediaLib:ndkBuild
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nova-cinema-alpha-apk
+          path: nova/Video/build/outputs/apk/noamazon/debug/*.apk
+          if-no-files-found: error

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<manifest>
+  <remote name="github" fetch="."/>
+  
+  <default remote="github" revision="master"/>
+  
+  <project name="aos-AVP" path="AVP" revision="5c5d4ec81b47ba59be8f91c9d877b49b0ab1c01e" upstream="nova" dest-branch="nova">
+    <copyfile src="Makefile" dest="Makefile"/>
+  </project>
+  <project name="aos-FileCoreLibrary" path="FileCoreLibrary" revision="78ca3812e0f291e4436e4f2c92722d07b4db99f9" upstream="v6.6" dest-branch="v6.6"/>
+  <project name="aos-MediaLib" path="MediaLib" revision="a07bc4f75cd9763c725c45949ebd052828e5667a" upstream="v6.6" dest-branch="v6.6"/>
+  <project name="aos-Video" path="Video" revision="a4f616367b63a384d4d7bc65b657e810327e9afb" upstream="v6.6" dest-branch="v6.6"/>
+  <project name="aos-audiocompress" path="native/audiocompress" revision="3a3f9324d2550bd305060e1c52b803121ea09aad" upstream="master" dest-branch="master"/>
+  <project name="aos-avos" path="native/avos" revision="5cf3ae9c1f70189d4180a62722150fa76b405a0f" upstream="v6.6" dest-branch="v6.6"/>
+  <project name="aos-boost-android-builder" path="native/boost" revision="43daa8621f4b74239d8fd52a545fe3344f0ff43c" upstream="master" dest-branch="master"/>
+  <project name="aos-libnativehelper" path="native/libnativehelper" revision="ab46fb536b594b25f93611ad7ef0f27b8fc24edb" upstream="master" dest-branch="master"/>
+  <project name="aos-libtorrent-android-builder" path="native/libtorrent-android-builder" revision="7e2cd1ed460a2a6ca4f5d5e32dde8f37f0cdb431" upstream="main" dest-branch="main"/>
+  <project name="dav1d-android-builder-nobin" path="native/dav1d-android-builder" revision="4c604fd5123909a6a28b48be35f1d0bc964dc9ab" upstream="v1_5" dest-branch="v1_5"/>
+  <project name="ffmpeg-android-builder-nobin" path="native/ffmpeg-android-builder" revision="e9ce2d2511e223e11a3bb41509314007d1fc5572" upstream="v9_0" dest-branch="v9_0"/>
+  <project name="fontconfig-android-builder" path="native/fontconfig-android-builder" revision="c51ce4b686828f75cb33e11875b9d5f2b6891323" upstream="main" dest-branch="main"/>
+  <project name="harfbuzz-android-builder" path="native/harfbuzz-android-builder" revision="71fb17057890c01559675dec703440dce472a764" upstream="main" dest-branch="main"/>
+  <project name="libass-android-builder" path="native/libass-android-builder" revision="69919b2d3deff70d81e31902e9660f6dbc432273" upstream="main" dest-branch="main"/>
+  <project name="libfreetype-android-builder" path="native/libfreetype-android-builder" revision="60784616139012a42e943929fd1bc32ecf9629a7" upstream="main" dest-branch="main"/>
+  <project name="libfribidi-android-builder" path="native/libfribidi-android-builder" revision="e4f95b0756367e9b889811502d93613bc1d679fe" upstream="main" dest-branch="main"/>
+  <project name="libmysofa-android-builder" path="native/libmysofa-android-builder" revision="dc97741d01fa3cee8c81312b24bb4414c3f85d5c" upstream="main" dest-branch="main"/>
+  <project name="libpng-android-builder" path="native/libpng-android-builder" revision="e4e9d60b8543d21bbef8ae1c40404c32a06db815" upstream="main" dest-branch="main"/>
+  <project name="libunibreak-android-builder" path="native/libunibreak-android-builder" revision="749c62001d13dc1996fb95e5963d72519b9d62e3" upstream="main" dest-branch="main"/>
+  <project name="libxml2-android-builder" path="native/libxml2-android-builder" revision="3b34564946997af8f3ecc38a8d6842ecd8a69909" upstream="main" dest-branch="main"/>
+  <project name="openssl-android-builder-nobin" path="native/openssl-android-builder" revision="8b961fa1f0103976f8b1e33a06be492de1a95349" upstream="v4_1" dest-branch="v4_1"/>
+  <project name="opus-android-builder-nobin" path="native/opus-android-builder" revision="91e0c9d81dcb6469f2422fcac7e10b840a0e3da2" upstream="20241012" dest-branch="20241012"/>
+  <project name="prebuilt-dav1d" path="native/prebuilt/dav1d" revision="f89559d62f671881431146b94c4364e568a623c8" upstream="v1_5" dest-branch="v1_5"/>
+  <project name="prebuilt-ffmpeg" path="native/prebuilt/ffmpeg" revision="699cb5c1a51ca3327f4507b1381b367a3999841a" upstream="v9_0" dest-branch="v9_0"/>
+  <project name="prebuilt-fontconfig" path="native/prebuilt/fontconfig" revision="f1650a7dcc1426c25447828108d3d8fca9f7f2a3" upstream="main" dest-branch="main"/>
+  <project name="prebuilt-freetype" path="native/prebuilt/freetype" revision="ed95689f3f9d89c140941cd917166df13ec4eb16" upstream="main" dest-branch="main"/>
+  <project name="prebuilt-fribidi" path="native/prebuilt/fribidi" revision="e98837fa4125def4dd2ee9f40c66cbf7646e7eb4" upstream="main" dest-branch="main"/>
+  <project name="prebuilt-harfbuzz" path="native/prebuilt/harfbuzz" revision="946eebc3130822bf6e620847120ff20eb81df274" upstream="main" dest-branch="main"/>
+  <project name="prebuilt-libass" path="native/prebuilt/libass" revision="e2a856c061bfb22569b815eb7b3c5581037e208c" upstream="main" dest-branch="main"/>
+  <project name="prebuilt-libmysofa" path="native/prebuilt/libmysofa" revision="ee9ba48ad4fb347c77d016662bc4744f5b677367" upstream="v1_3" dest-branch="v1_3"/>
+  <project name="prebuilt-libpng" path="native/prebuilt/libpng" revision="bd3a2ed5450521783451252b9fc77c25832e88d1" upstream="main" dest-branch="main"/>
+  <project name="prebuilt-libunibreak" path="native/prebuilt/libunibreak" revision="afcf4bc13971ef204f6995c66102a891a54f96a1" upstream="main" dest-branch="main"/>
+  <project name="prebuilt-libxml2" path="native/prebuilt/libxml2" revision="2ea77c966e41d4a9c561a5f48cf94e528739f21a" upstream="main" dest-branch="main"/>
+  <project name="prebuilt-openssl" path="native/prebuilt/openssl" revision="a115df3031d7154de5048d15a0f75d7e047b4114" upstream="v4_1" dest-branch="v4_1"/>
+  <project name="prebuilt-opus" path="native/prebuilt/opus" revision="bd2b8d8867fb4c8d964300c5e981933140fb3170" upstream="main" dest-branch="main"/>
+  <project name="prebuilt-torrentd" path="native/prebuilt/torrentd" revision="c97c5f52717c222c1b7b0d8d9381e876a3ccbf21" upstream="main" dest-branch="main"/>
+  <project name="prebuilt-zlib" path="native/prebuilt/zlib" revision="9652902edc3fb6d4ef2530c4e164771d704cd976" upstream="main" dest-branch="main"/>
+  <project name="torrentd-nobin" path="native/torrentd" revision="0a3e55d0e256725a8694c7fe3c23a8a927301152" upstream="master" dest-branch="master"/>
+  <project name="zlib-android-builder" path="native/zlib-android-builder" revision="d0d3cbaacb4b9e5695225afcd76d1a6d3b10c1a2" upstream="main" dest-branch="main"/>
+</manifest>
