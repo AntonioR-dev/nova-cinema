@@ -20,7 +20,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.13'
-      - uses: android-actions/setup-android@v3
+      - name: Use runner Android SDK command-line tools
+        run: |
+          echo "$ANDROID_HOME/cmdline-tools/latest/bin" >> "$GITHUB_PATH"
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --version
       - name: Install Android platform
         run: sdkmanager 'platforms;android-37.0' 'build-tools;36.0.0'
       - name: Prepare pinned dependencies and verified official native binaries
