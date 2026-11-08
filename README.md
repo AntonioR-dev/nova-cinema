@@ -1,10 +1,10 @@
-# Nova Cinema — alpha 0.1.0
+# Nova Cinema — alpha 0.1.1
 
 Fork sperimentale non ufficiale di **NOVA Video Player 6.6.4**, con una home Android TV cinematografica: sfondo del contenuto selezionato, titolo, trama e copertine navigabili con il telecomando. Non è affiliato ad Apple, Cinaura o agli sviluppatori NOVA.
 
 ## Download per Fire TV / Downloader
 
-**APK:** https://github.com/AntonioR-dev/nova-cinema/releases/download/v0.1.0-alpha.1/nova-cinema.apk
+**APK:** https://github.com/AntonioR-dev/nova-cinema/releases/download/v0.1.1-alpha.1/nova-cinema.apk
 
 La prima versione è una **alpha firmata con chiave di sviluppo**, non una release stabile. Si installa come **Nova Cinema** (`dev.antonior.novacinema`) accanto a NOVA: non importa automaticamente libreria, impostazioni o password dell'altra app.
 

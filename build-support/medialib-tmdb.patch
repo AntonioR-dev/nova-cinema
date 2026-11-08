@@ -1,3 +1,23 @@
+diff --git a/src/com/archos/mediaprovider/ArchosMediaCommon.java b/src/com/archos/mediaprovider/ArchosMediaCommon.java
+index 60a9c5a..11db1d1 100644
+--- a/src/com/archos/mediaprovider/ArchosMediaCommon.java
++++ b/src/com/archos/mediaprovider/ArchosMediaCommon.java
+@@ -38,13 +38,13 @@ public final class ArchosMediaCommon {
+     public static final String AUTHORITY_ANDROID = "media";
+     public static final String CONTENT_AUTHORITY_SLASH_ANDROID = CONTENT + AUTHORITY_ANDROID + SLASH;
+ 
+-    public static final String AUTHORITY_VIDEO = "com.archos.media.videocommunity";
++    public static final String AUTHORITY_VIDEO = "dev.antonior.novacinema.media.video";
+     public static final String CONTENT_AUTHORITY_SLASH_VIDEO = CONTENT + AUTHORITY_VIDEO + SLASH;
+ 
+     public static final String AUTHORITY_MUSIC = "com.archos.media.music";
+     public static final String CONTENT_AUTHORITY_SLASH_MUSIC = CONTENT + AUTHORITY_MUSIC + SLASH;
+ 
+-    public static final String AUTHORITY_SCRAPER = "com.archos.media.scrapercommunity";
++    public static final String AUTHORITY_SCRAPER = "dev.antonior.novacinema.media.scraper";
+     public static final String CONTENT_AUTHORITY_SLASH_SCRAPER = CONTENT + AUTHORITY_SCRAPER + SLASH;
+ 
+     /* Scanned files get _id >= this value. (Integer.MAX_VALUE / 2) rounded to human readable form */
 diff --git a/src/com/archos/mediascraper/AllCollectionScrapeService.java b/src/com/archos/mediascraper/AllCollectionScrapeService.java
 index f684830..a07112f 100644
 --- a/src/com/archos/mediascraper/AllCollectionScrapeService.java

@@ -18,8 +18,7 @@
     xmlns:dist="http://schemas.android.com/apk/distribution"
     xmlns:tools="http://schemas.android.com/tools"
     android:installLocation="auto"
-    android:sharedUserId="archos.openmediacenter"
-    android:sharedUserMaxSdkVersion="32"
+
     tools:ignore="UnusedAttribute">
 
     <supports-screens android:largeScreens="true" />
@@ -198,7 +197,7 @@
              query the suggestion cursor. -->
         <provider
             android:name="com.archos.mediacenter.video.browser.SearchProviderVideo"
-            android:authorities="browser.SearchProviderVideocommunity"
+            android:authorities="${applicationId}.browser.search"
             android:exported="true"
             android:readPermission="android.permission.GLOBAL_SEARCH" />
 
@@ -1248,7 +1247,7 @@
         <!-- ContentProvider for media -->
         <provider
             android:name="com.archos.mediaprovider.video.VideoProvider"
-            android:authorities="com.archos.media.videocommunity;com.archos.media.scrapercommunity"
+            android:authorities="${applicationId}.media.video;${applicationId}.media.scraper"
             android:exported="true"
             tools:ignore="ExportedContentProvider" />
         <!-- BroadcastReceiver to trigger database import -->
