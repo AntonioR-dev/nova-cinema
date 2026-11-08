@@ -19,7 +19,7 @@ Questa versione usa immagini di sfondo; **non riproduce trailer automatici**. SM
 
 ## Stato dei test
 
-Compilazione Android, firma APK e test mirati sono verificati prima della pubblicazione. La suite estesa di MediaLib ha mostrato fallimenti non risolti in questo ambiente: **non è dichiarata interamente superata**. Nessun dispositivo Fire Stick è collegato all'ambiente di sviluppo: aspetto reale, telecomando, decodifica hardware e streaming sulla rete dell'utente richiedono una prova sul dispositivo.
+Compilazione Android, firma APK e test mirati sono verificati prima della pubblicazione. La suite estesa di MediaLib ha mostrato fallimenti non risolti in questo ambiente: **non è dichiarata interamente superata**. Installazione e avvio iniziale sono stati verificati via ADB su una Fire Stick Amazon AFTKA (API 28), con NOVA originale ancora installato. L’avvio ha raggiunto la richiesta di accesso ai file; navigazione, resa grafica con una libreria reale, decodifica hardware e streaming restano da provare.
 
 ## Compilazione
 
