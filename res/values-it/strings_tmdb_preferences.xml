@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="preferences_tmdb_api_key_title">Chiave API TMDb</string>
+    <string name="preferences_tmdb_api_key_summary">Inserisci la tua chiave API TMDb v3, non il token di accesso, per scaricare metadati, copertine e sfondi di film, serie e raccolte. Le modifiche valgono per le nuove richieste. Lascia vuoto per cancellare la chiave salvata. Non viene usata alcuna chiave incorporata.</string>
+</resources>

@@ -14,3 +14,7 @@ keystore.properties
 sentry.properties
 nova.json
 crowdin.yml
+__pycache__/
+*.pyc
+*.keystore
+*.jks

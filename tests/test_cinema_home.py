@@ -23,7 +23,25 @@ class CinemaHomeLayoutTest(unittest.TestCase):
         self.assertEqual('false', views['cinema_backdrop'].get(ANDROID + 'focusable'))
         self.assertEqual('3', views['cinema_hero_overview'].get(ANDROID + 'maxLines'))
         self.assertEqual('end', views['cinema_hero_title'].get(ANDROID + 'ellipsize'))
-        self.assertEqual('184dp', views['cinema_browse_content'].get(ANDROID + 'layout_marginTop'))
+        hero = next(v for v in root if v.tag == 'LinearLayout')
+        dp = lambda view, key: float(view.get(ANDROID + key, '0dp').removesuffix('dp'))
+        hero_bottom = dp(hero, 'layout_marginTop') + dp(hero, 'layout_height')
+        browse_top = dp(views['cinema_browse_content'], 'layout_marginTop')
+        self.assertGreaterEqual(browse_top - hero_bottom, 16,
+                                'Hero and shelves need a real gap, not overlapping fixed regions')
+        self.assertEqual('match_parent', hero.get(ANDROID + 'layout_width'))
+        self.assertGreater(dp(hero, 'layout_marginEnd'), 0)
+        self.assertEqual('match_parent', views['cinema_hero_overview'].get(ANDROID + 'layout_width'))
+        self.assertEqual('0dp', views['cinema_hero_overview'].get(ANDROID + 'layout_height'))
+        self.assertEqual('1', views['cinema_hero_overview'].get(ANDROID + 'layout_weight'))
+        # Resource geometry at a 960x540dp TV, not a substitute for device text measurement.
+        self.assertGreaterEqual(540 - browse_top, 300, 'Leave a usable first shelf viewport')
+        self.assertGreaterEqual(dp(hero, 'layout_height'), 192,
+                                'Allow category + two-line 32sp title + bounded overview')
+        for viewport_width in (640, 960):
+            available_width = viewport_width - dp(hero, 'layout_marginStart') - dp(hero, 'layout_marginEnd')
+            self.assertGreater(available_width, 0)
+        self.assertEqual('2', views['cinema_hero_title'].get(ANDROID + 'maxLines'))
         for name in ('cinema_scrim_start', 'cinema_scrim_bottom'):
             self.assertTrue((ROOT / 'res/drawable' / (name + '.xml')).exists())
 

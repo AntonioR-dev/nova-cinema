@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Scrapers use only the user-entered preference; strip the upstream resource key. -->
+    <string name="tmdb_api_key" translatable="false"></string>
+    <string name="preferences_tmdb_api_key_title">TMDb API key</string>
+    <string name="preferences_tmdb_api_key_summary">Enter your own TMDb API key (v3, not the API Read Access Token) for movie, TV and collection metadata. Changes apply to new requests. Leave blank to clear the saved key. Online metadata requires your own key; no bundled key is used.</string>
+</resources>

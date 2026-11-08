@@ -53,7 +53,10 @@ final class CinemaHeroController {
     }
 
     void refresh() {
-        cancelArtwork();
+        // Cancel the old lookup immediately, but retain the displayed film while focus settles.
+        boolean retainArtwork = !destroyed && !paused && !PrivateMode.isActive()
+                && (selectedItem instanceof Video || selectedItem instanceof Tvshow);
+        cancelArtwork(!retainArtwork);
         if (destroyed || paused) return;
         renderedPrivateMode = PrivateMode.isActive();
         category.setText(PrivateMode.isActive() ? "" : selectedCategory);
@@ -107,14 +110,21 @@ final class CinemaHeroController {
     }
 
     private void cancelArtwork() {
+        cancelArtwork(true);
+    }
+
+    private void cancelArtwork(boolean clear) {
         handler.removeCallbacksAndMessages(null);
         if (backdropTask != null) {
-            backdropTask.cancelAndClear();
+            if (clear) backdropTask.cancelAndClear();
+            else backdropTask.cancelTaskOnly();
             backdropTask = null;
         }
-        // Also clear when a selection was cancelled during the debounce interval.
-        backdrop.animate().cancel();
-        backdrop.setAlpha(0f);
-        backdrop.setImageDrawable(null);
+        if (clear) {
+            // Also clear retained artwork when no task exists during the debounce interval.
+            backdrop.animate().cancel();
+            backdrop.setAlpha(0f);
+            backdrop.setImageDrawable(null);
+        }
     }
 }

@@ -1,0 +1,339 @@
+diff --git a/src/com/archos/mediascraper/AllCollectionScrapeService.java b/src/com/archos/mediascraper/AllCollectionScrapeService.java
+index f684830..a07112f 100644
+--- a/src/com/archos/mediascraper/AllCollectionScrapeService.java
++++ b/src/com/archos/mediascraper/AllCollectionScrapeService.java
+@@ -82,6 +82,7 @@ public class AllCollectionScrapeService extends Service implements DefaultLifecy
+     private static volatile CollectionsService collectionService = null;
+ 
+     static String apiKey = null;
++    private static Context credentialContext;
+ 
+     private volatile Looper mServiceLooper;
+     private volatile ServiceHandler mServiceHandler;
+@@ -99,15 +100,24 @@ public class AllCollectionScrapeService extends Service implements DefaultLifecy
+     }
+ 
+     public static synchronized void reauth() {
++        if (credentialContext != null) apiKey = TmdbApiKey.get(credentialContext);
+         tmdb = new MyTmdb(apiKey, cache);
+         collectionService = tmdb.collectionService();
+     }
+ 
+     public static synchronized CollectionsService getCollectionService() {
++        refreshCredentials();
+         if (collectionService == null) reauth();
+         return collectionService;
+     }
+ 
++    // Called under the class lock; keep cached clients in sync without a service restart.
++    private static void refreshCredentials() {
++        if (credentialContext != null && !TmdbApiKey.get(credentialContext).equals(apiKey)) {
++            reauth();
++        }
++    }
++
+     /** State consumed by the Leanback scanner/scraper progress overlay. */
+     public static boolean isCollectionScrapeInProgress() {
+         return sCollectionScrapeInProgress;
+@@ -197,7 +207,8 @@ public class AllCollectionScrapeService extends Service implements DefaultLifecy
+         // ensure cache is initialized
+         synchronized (AllCollectionScrapeService.class) {
+             cache = ScraperCache.getCache(getApplicationContext());
+-            apiKey = getString(R.string.tmdb_api_key);
++            credentialContext = getApplicationContext();
++            refreshCredentials();
+         }
+ 
+         // need to do that early to avoid ANR on Android 26+
+diff --git a/src/com/archos/mediascraper/TmdbApiKey.java b/src/com/archos/mediascraper/TmdbApiKey.java
+new file mode 100644
+index 0000000..5fa685e
+--- /dev/null
++++ b/src/com/archos/mediascraper/TmdbApiKey.java
+@@ -0,0 +1,19 @@
++package com.archos.mediascraper;
++
++import android.content.Context;
++import androidx.preference.PreferenceManager;
++
++
++/** Runtime credential override shared by movie, TV and collection scrapers. */
++public final class TmdbApiKey {
++    public static final String PREFERENCE_KEY = "tmdb_api_key";
++
++    private TmdbApiKey() {}
++
++    /** Blank/unset keys stay empty, even if upstream resources contain a developer key. */
++    public static String get(Context context) {
++        String key = PreferenceManager.getDefaultSharedPreferences(context)
++                .getString(PREFERENCE_KEY, "");
++        return key == null ? "" : key.trim();
++    }
++}
+diff --git a/src/com/archos/mediascraper/xml/MovieScraper3.java b/src/com/archos/mediascraper/xml/MovieScraper3.java
+index 58c6db2..9f87d53 100644
+--- a/src/com/archos/mediascraper/xml/MovieScraper3.java
++++ b/src/com/archos/mediascraper/xml/MovieScraper3.java
+@@ -28,6 +28,7 @@ import com.archos.mediascraper.Scraper;
+ import com.archos.mediascraper.ScraperCache;
+ import com.archos.mediascraper.SearchResult;
+ import com.archos.mediascraper.TagsFactory;
++import com.archos.mediascraper.TmdbApiKey;
+ import com.archos.mediascraper.preprocess.MovieSearchInfo;
+ import com.archos.mediascraper.preprocess.SearchInfo;
+ import com.archos.mediascraper.preprocess.SearchPreprocessor;
+@@ -84,17 +85,20 @@ public class MovieScraper3 extends BaseScraper2 {
+     private static volatile CollectionsService collectionService = null;
+ 
+     static String apiKey = null;
++    private static Context credentialContext;
+ 
+     public MovieScraper3(Context context) {
+         super(context);
+         // ensure cache is initialized
+         synchronized (MovieScraper3.class) {
+             cache = ScraperCache.getCache(context);
+-            apiKey = context.getString(R.string.tmdb_api_key);
++            credentialContext = context.getApplicationContext();
++            refreshCredentials();
+         }
+     }
+ 
+     public static synchronized void reauth() {
++        if (credentialContext != null) apiKey = TmdbApiKey.get(credentialContext);
+         tmdb = new MyTmdb(apiKey, cache);
+         searchService = tmdb.searchService();
+         moviesService = tmdb.moviesService();
+@@ -102,25 +106,36 @@ public class MovieScraper3 extends BaseScraper2 {
+     }
+ 
+     public static synchronized MyTmdb getTmdb() {
++        refreshCredentials();
+         if (tmdb == null) reauth();
+         return tmdb;
+     }
+ 
+     public static synchronized SearchService getSearchService() {
++        refreshCredentials();
+         if (searchService == null) reauth();
+         return searchService;
+     }
+ 
+     public static synchronized MoviesService getMoviesService() {
++        refreshCredentials();
+         if (moviesService == null) reauth();
+         return moviesService;
+     }
+ 
+     public static synchronized CollectionsService getCollectionService() {
++        refreshCredentials();
+         if (collectionService == null) reauth();
+         return collectionService;
+     }
+ 
++    // Called under the class lock; keep cached clients in sync without an app restart.
++    private static void refreshCredentials() {
++        if (credentialContext != null && !TmdbApiKey.get(credentialContext).equals(apiKey)) {
++            reauth();
++        }
++    }
++
+     @Override
+     public ScrapeSearchResult getMatches2(SearchInfo info, int maxItems) {
+         // check input
+diff --git a/src/com/archos/mediascraper/xml/ShowScraper4.java b/src/com/archos/mediascraper/xml/ShowScraper4.java
+index afee9ce..95d589b 100644
+--- a/src/com/archos/mediascraper/xml/ShowScraper4.java
++++ b/src/com/archos/mediascraper/xml/ShowScraper4.java
+@@ -73,6 +73,7 @@ import okhttp3.Cache;
+ import static com.archos.mediascraper.TagsFactory.buildShowTagsOnlineId;
+ 
+ import androidx.preference.PreferenceManager;
++import com.archos.mediascraper.TmdbApiKey;
+ 
+ public class ShowScraper4 extends BaseScraper2 {
+     private static final String PREFERENCE_NAME = "themoviedb.org";
+@@ -104,13 +105,15 @@ public class ShowScraper4 extends BaseScraper2 {
+ 
+     private static volatile MyTmdb tmdb = null;
+     static String apiKey = null;
++    private static Context credentialContext;
+ 
+     public ShowScraper4(Context context) {
+         super(context);
+         // ensure cache is initialized
+         synchronized (ShowScraper4.class) {
+             cache = ScraperCache.getCache(context);
+-            apiKey = context.getString(R.string.tmdb_api_key);
++            credentialContext = context.getApplicationContext();
++            refreshCredentials();
+         }
+     }
+ 
+@@ -119,14 +122,23 @@ public class ShowScraper4 extends BaseScraper2 {
+     }
+ 
+     public static synchronized void reauth() {
++        if (credentialContext != null) apiKey = TmdbApiKey.get(credentialContext);
+         tmdb = new MyTmdb(apiKey, cache);
+     }
+     
+     public static synchronized MyTmdb getTmdb() {
++        refreshCredentials();
+         if (tmdb == null) reauth();
+         return tmdb;
+     }
+ 
++    // Called under the class lock; keep cached clients in sync without an app restart.
++    private static void refreshCredentials() {
++        if (credentialContext != null && !TmdbApiKey.get(credentialContext).equals(apiKey)) {
++            reauth();
++        }
++    }
++
+     @Override
+     public ScrapeSearchResult getMatches2(SearchInfo info, int maxItems) {
+         // maxItems = -1 means all
+diff --git a/test/java/com/archos/mediascraper/TmdbApiKeyTest.java b/test/java/com/archos/mediascraper/TmdbApiKeyTest.java
+new file mode 100644
+index 0000000..aab6428
+--- /dev/null
++++ b/test/java/com/archos/mediascraper/TmdbApiKeyTest.java
+@@ -0,0 +1,48 @@
++package com.archos.mediascraper;
++
++import static org.junit.Assert.assertEquals;
++
++import android.content.Context;
++import androidx.preference.PreferenceManager;
++import androidx.test.core.app.ApplicationProvider;
++
++import org.junit.Before;
++import org.junit.Test;
++import org.junit.runner.RunWith;
++import org.robolectric.RobolectricTestRunner;
++import org.robolectric.annotation.Config;
++
++@RunWith(RobolectricTestRunner.class)
++@Config(sdk = 33)
++public class TmdbApiKeyTest {
++    private Context context;
++
++    @Before public void setUp() {
++        context = ApplicationProvider.getApplicationContext();
++        PreferenceManager.getDefaultSharedPreferences(context).edit().clear().commit();
++    }
++
++    @Test public void savedUserKeyOverridesPackagedFallback() {
++        PreferenceManager.getDefaultSharedPreferences(context).edit()
++                .putString("tmdb_api_key", "  user-supplied-test-key  ").commit();
++        assertEquals("user-supplied-test-key", TmdbApiKey.get(context));
++    }
++
++    @Test public void missingOrBlankKeyNeverUsesPackagedDeveloperCredential() {
++        assertEquals("", TmdbApiKey.get(context));
++        PreferenceManager.getDefaultSharedPreferences(context).edit()
++                .putString("tmdb_api_key", " \t ").commit();
++        assertEquals("", TmdbApiKey.get(context));
++    }
++
++    @Test public void readsChangedAndRemovedKeyWithoutRestart() {
++        PreferenceManager.getDefaultSharedPreferences(context).edit()
++                .putString("tmdb_api_key", "first-test-key").commit();
++        assertEquals("first-test-key", TmdbApiKey.get(context));
++        PreferenceManager.getDefaultSharedPreferences(context).edit()
++                .putString("tmdb_api_key", "second-test-key").commit();
++        assertEquals("second-test-key", TmdbApiKey.get(context));
++        PreferenceManager.getDefaultSharedPreferences(context).edit().remove("tmdb_api_key").commit();
++        assertEquals("", TmdbApiKey.get(context));
++    }
++}
+diff --git a/test/java/com/archos/mediascraper/TmdbCredentialRefreshTest.java b/test/java/com/archos/mediascraper/TmdbCredentialRefreshTest.java
+new file mode 100644
+index 0000000..8c444bd
+--- /dev/null
++++ b/test/java/com/archos/mediascraper/TmdbCredentialRefreshTest.java
+@@ -0,0 +1,83 @@
++package com.archos.mediascraper;
++
++import static org.junit.Assert.assertEquals;
++import static org.junit.Assert.assertNotSame;
++import static org.junit.Assert.assertSame;
++
++import android.content.Context;
++import androidx.preference.PreferenceManager;
++import androidx.test.core.app.ApplicationProvider;
++
++import com.archos.mediascraper.xml.MovieScraper3;
++import com.archos.mediascraper.xml.ShowScraper4;
++import java.lang.reflect.Field;
++import org.junit.Before;
++import org.junit.Test;
++import org.junit.runner.RunWith;
++import org.robolectric.RobolectricTestRunner;
++import org.robolectric.annotation.Config;
++
++@RunWith(RobolectricTestRunner.class)
++@Config(sdk = 33)
++public class TmdbCredentialRefreshTest {
++    private Context context;
++
++    @Before public void setUp() {
++        context = ApplicationProvider.getApplicationContext();
++        save("initial-test-key");
++    }
++
++    private void save(String key) {
++        PreferenceManager.getDefaultSharedPreferences(context).edit()
++                .putString("tmdb_api_key", key).commit();
++    }
++
++    private static Object field(Class<?> type, String name) throws Exception {
++        Field f = type.getDeclaredField(name);
++        f.setAccessible(true);
++        return f.get(null);
++    }
++
++    @Test public void moviesUseSavedKeyAndRefreshEveryCachedService() throws Exception {
++        new MovieScraper3(context);
++        Object tmdb = MovieScraper3.getTmdb();
++        Object search = MovieScraper3.getSearchService();
++        Object movies = MovieScraper3.getMoviesService();
++        Object collections = MovieScraper3.getCollectionService();
++        assertEquals("initial-test-key", field(MovieScraper3.class, "apiKey"));
++        assertSame(tmdb, MovieScraper3.getTmdb());
++        save("replacement-test-key");
++        assertNotSame(search, MovieScraper3.getSearchService());
++        assertNotSame(movies, MovieScraper3.getMoviesService());
++        assertNotSame(collections, MovieScraper3.getCollectionService());
++        assertNotSame(tmdb, MovieScraper3.getTmdb());
++        assertEquals("replacement-test-key", field(MovieScraper3.class, "apiKey"));
++        save("");
++        MovieScraper3.getMoviesService();
++        assertEquals("", field(MovieScraper3.class, "apiKey"));
++    }
++
++    @Test public void showsRefreshExistingClientWithoutReconstruction() throws Exception {
++        new ShowScraper4(context);
++        Object tmdb = ShowScraper4.getTmdb();
++        assertEquals("initial-test-key", field(ShowScraper4.class, "apiKey"));
++        assertSame(tmdb, ShowScraper4.getTmdb());
++        save("replacement-test-key");
++        assertNotSame(tmdb, ShowScraper4.getTmdb());
++        assertEquals("replacement-test-key", field(ShowScraper4.class, "apiKey"));
++    }
++
++    @Test public void collectionsRefreshExistingServiceWithoutRestart() throws Exception {
++        // Supply only the application context: starting the Android service would also
++        // start its worker thread/notification, unrelated to credential resolution.
++        Field f = AllCollectionScrapeService.class.getDeclaredField("credentialContext");
++        f.setAccessible(true);
++        f.set(null, context);
++        Object service = AllCollectionScrapeService.getCollectionService();
++        assertEquals("initial-test-key", field(AllCollectionScrapeService.class, "apiKey"));
++        assertSame(service, AllCollectionScrapeService.getCollectionService());
++        save("replacement-test-key");
++        assertNotSame(service, AllCollectionScrapeService.getCollectionService());
++        assertEquals("replacement-test-key", field(AllCollectionScrapeService.class, "apiKey"));
++    }
++}

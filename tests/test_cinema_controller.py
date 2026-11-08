@@ -37,7 +37,9 @@ public class View {
  public static class Animator { public void cancel() {} }
 }''',
     'android/widget/ImageView.java': '''package android.widget; public class ImageView extends android.view.View {
- public int clears; public void setAlpha(float f) {} public void setImageDrawable(Object o) { if(o == null) clears++; }
+ public int clears; public Object drawable; public float alpha;
+ public void setAlpha(float f) { alpha=f; }
+ public void setImageDrawable(Object o) { drawable=o; if(o == null) clears++; }
 }''',
     'android/widget/TextView.java': '''package android.widget; public class TextView extends android.view.View {
  public String text = ""; public void setText(CharSequence s) { text = s == null ? "" : s.toString(); }
@@ -60,10 +62,12 @@ public class Icon { public String getName() { return "Settings"; } }''',
 public class PrivateMode { public static boolean active; public static boolean isActive() { return active; } }''',
     'com/archos/mediacenter/video/leanback/BackdropTask.java': '''package com.archos.mediacenter.video.leanback;
 public class BackdropTask {
- public static int loads,cancels; public static Object last;
- public BackdropTask(android.app.Activity a,android.widget.ImageView v,int c) {}
- public BackdropTask execute(Object item) { loads++;last=item;return this; }
- public void cancelAndClear() { cancels++; }
+ public static int loads,cancels,taskOnlyCancels; public static Object last;
+ private final android.widget.ImageView view;
+ public BackdropTask(android.app.Activity a,android.widget.ImageView v,int c) { view=v; }
+ public BackdropTask execute(Object item) { loads++;last=item;view.setImageDrawable(item);view.setAlpha(1f);return this; }
+ public void cancelTaskOnly() { taskOnlyCancels++; }
+ public void cancelAndClear() { cancels++;view.setImageDrawable(null);view.setAlpha(0f); }
 }''',
 }
 HARNESS = '''package com.archos.mediacenter.video.leanback;
@@ -79,6 +83,24 @@ import com.archos.mediacenter.video.leanback.adapter.object.Box;
 import com.archos.mediacenter.video.player.PrivateMode;
 public class CinemaHeroHostTest {
  static void check(boolean ok,String why) { if(!ok) throw new AssertionError(why); }
+ static void checkClearDuringDebounce(String action) {
+  View root=new View(); ImageView image=new ImageView();
+  root.children.put(R.id.cinema_backdrop,image); root.children.put(R.id.cinema_hero_title,new TextView());
+  root.children.put(R.id.cinema_hero_overview,new TextView()); root.children.put(R.id.cinema_hero_category,new TextView());
+  CinemaHeroController hero=new CinemaHeroController(new Activity(),root);
+  Video first=new Video("First","Plot"); hero.select(first,"Movies"); Handler.drain();
+  int loads=BackdropTask.loads;
+  hero.select(new Video("Next","Next plot"),"Movies");
+  check(image.drawable==first,"Previous film must remain visible before " + action);
+  if(action.equals("pause")) hero.pause();
+  else if(action.equals("destroy")) hero.destroy();
+  else if(action.equals("privacy")) { PrivateMode.active=true; hero.refresh(); }
+  else hero.select(new com.archos.mediacenter.video.leanback.adapter.object.Icon(),"Settings");
+  Handler.drain();
+  check(image.drawable==null && image.alpha==0f && BackdropTask.loads==loads,
+    action + " must clear retained artwork and cancel pending loads without an active task");
+  PrivateMode.active=false; hero.destroy();
+ }
  public static void main(String[] args) {
   View root=new View(); ImageView image=new ImageView(); TextView title=new TextView(),overview=new TextView(),category=new TextView();
   root.children.put(R.id.cinema_backdrop,image); root.children.put(R.id.cinema_hero_title,title);
@@ -92,8 +114,14 @@ public class CinemaHeroHostTest {
   Handler.drain(); check(BackdropTask.loads==1 && BackdropTask.last==second,"Only latest focused movie should load");
   int clears=image.clears; hero.select(second,"Movies"); Handler.drain();
   check(BackdropTask.loads==1 && image.clears==clears,"Duplicate focus events must not clear or reload displayed artwork");
+  hero.select(first,"Movies");
+  check(BackdropTask.taskOnlyCancels==1 && image.drawable==second && image.alpha==1f && image.clears==clears,
+    "Film transition must cancel stale requests without clearing displayed artwork during debounce");
+  hero.select(second,"Movies");
+  check(image.drawable==second && image.clears==clears && Handler.pending.size()==1,
+    "Rapid film transitions must preserve artwork even when the old task reference is already released");
   hero.select(new Box(),"Browse"); Handler.drain();
-  check(BackdropTask.cancels==1 && overview.text.isEmpty() && title.text.equals("Network storage"),"Utility tiles must clear stale movie data and artwork");
+  check(image.drawable==null && image.alpha==0f && overview.text.isEmpty() && title.text.equals("Network storage"),"Utility tiles must clear stale movie data and artwork even during debounce");
   Tvshow show=new Tvshow("Severance","Work and life divided."); hero.select(show,"TV shows");
   check(overview.text.equals("Work and life divided."),"TV plot must use existing mapped field");
   hero.pause(); Handler.drain(); check(BackdropTask.loads==1 && overview.text.isEmpty(),"Pause must cancel pending work and clear metadata");
@@ -103,7 +131,8 @@ public class CinemaHeroHostTest {
   PrivateMode.active=false; hero.select(new Video("   ",null),"Movies");
   check(title.text.equals("NOVA") && overview.text.isEmpty(),"Missing metadata must use clean fallback");
   hero.destroy(); Handler.drain(); check(BackdropTask.loads==2,"Destroyed hero must never deliver pending artwork");
-  System.out.println("PASS: fallback, mapped metadata, debounce, duplicate focus, utilities, TV plot, pause/resume, privacy, destroy");
+  for(String action: new String[]{"pause","destroy","privacy","utility"}) checkClearDuringDebounce(action);
+  System.out.println("PASS: fallback, mapped metadata, debounce with retained artwork, duplicate focus, utilities, TV plot, pause/resume, privacy, destroy; all clear during debounce");
  }
 }'''
 

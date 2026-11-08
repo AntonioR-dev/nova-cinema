@@ -27,9 +27,10 @@
         android:importantForAccessibility="no" />
 
     <LinearLayout
-        android:layout_width="520dp"
-        android:layout_height="176dp"
+        android:layout_width="match_parent"
+        android:layout_height="192dp"
         android:layout_marginStart="56dp"
+        android:layout_marginEnd="56dp"
         android:layout_marginTop="24dp"
         android:orientation="vertical"
         android:focusable="false">
@@ -59,8 +60,9 @@
 
         <TextView
             android:id="@+id/cinema_hero_overview"
-            android:layout_width="480dp"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
             android:layout_marginTop="10dp"
             android:lineSpacingExtra="3dp"
             android:textColor="#DBE1EB"
@@ -73,5 +75,5 @@
         android:id="@+id/cinema_browse_content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="184dp" />
+        android:layout_marginTop="232dp" />
 </FrameLayout>

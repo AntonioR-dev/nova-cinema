@@ -4,7 +4,7 @@ Fork sperimentale non ufficiale di **NOVA Video Player 6.6.4**, con una home And
 
 ## Download per Fire TV / Downloader
 
-**APK:** https://github.com/AntonioR-dev/nova-cinema/releases/latest/download/nova-cinema.apk
+**APK:** https://github.com/AntonioR-dev/nova-cinema/releases/download/v0.1.0-alpha.1/nova-cinema.apk
 
 La prima versione è una **alpha firmata con chiave di sviluppo**, non una release stabile. Si installa come **Nova Cinema** (`dev.antonior.novacinema`) accanto a NOVA: non importa automaticamente libreria, impostazioni o password dell'altra app.
 
@@ -12,14 +12,14 @@ La prima versione è una **alpha firmata con chiave di sviluppo**, non una relea
 
 1. Installa l'APK e concedi l'accesso ai contenuti richiesto dall'app.
 2. Configura la condivisione SMB nelle sorgenti di rete, come in NOVA.
-3. Configura la tua chiave API TMDb nelle impostazioni del fork per attivare ricerca metadati, copertine e sfondi. Nessuna chiave personale è pubblicata nel repository.
+3. Apri **Preferenze → Poster & descrizioni → Chiave API TMDb** e inserisci la tua **chiave API v3** (non il Read Access Token). È necessaria per i metadati online; un campo vuoto non usa alcuna chiave dello sviluppatore. Non inserire la chiave nelle issue o nel repository.
 4. Indicizza i video e prova la selezione delle copertine con il telecomando.
 
 Questa versione usa immagini di sfondo; **non riproduce trailer automatici**. SMB e player non sono stati ottimizzati o riscritti. È stata mantenuta la base NOVA 6.6.4; non è una promessa di miglioramenti prestazionali.
 
 ## Stato dei test
 
-Compilazione Android, firma APK e test automatici vengono verificati prima della pubblicazione. Nessun dispositivo Fire Stick è collegato all'ambiente di sviluppo: aspetto reale, telecomando, decodifica hardware e streaming sulla rete dell'utente richiedono una prova sul dispositivo.
+Compilazione Android, firma APK e test mirati sono verificati prima della pubblicazione. La suite estesa di MediaLib ha mostrato fallimenti non risolti in questo ambiente: **non è dichiarata interamente superata**. Nessun dispositivo Fire Stick è collegato all'ambiente di sviluppo: aspetto reale, telecomando, decodifica hardware e streaming sulla rete dell'utente richiedono una prova sul dispositivo.
 
 ## Compilazione
 

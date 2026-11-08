@@ -31,6 +31,9 @@ jobs:
       - name: Test cinematic home and TMDb settings
         working-directory: nova/Video
         run: python -m unittest discover -s tests -p 'test_*.py' -v
+      - name: Test runtime TMDb credential handling
+        working-directory: nova/Video
+        run: bash ./gradlew --no-daemon --console=plain :MediaLib:testDebugUnitTest --tests com.archos.mediascraper.TmdbApiKeyTest --tests com.archos.mediascraper.TmdbCredentialRefreshTest -x :FileCoreLibrary:ndkBuild -x :MediaLib:ndkBuild
       - name: Build installable alpha APK
         working-directory: nova/Video
         run: |
